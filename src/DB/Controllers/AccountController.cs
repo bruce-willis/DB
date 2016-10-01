@@ -24,19 +24,23 @@ namespace DB.Controllers
     private readonly IEmailSender _emailSender;
     private readonly ISmsSender _smsSender;
     private readonly ILogger _logger;
+    private readonly ShopContext _context;
 
     public AccountController(
         UserManager<ApplicationUser> userManager,
         SignInManager<ApplicationUser> signInManager,
         IEmailSender emailSender,
         ISmsSender smsSender,
-        ILoggerFactory loggerFactory)
+        ILoggerFactory loggerFactory,
+        ShopContext context
+      )
     {
       _userManager = userManager;
       _signInManager = signInManager;
       _emailSender = emailSender;
       _smsSender = smsSender;
       _logger = loggerFactory.CreateLogger<AccountController>();
+      _context = context;
     }
 
     //
@@ -107,15 +111,10 @@ namespace DB.Controllers
       ViewData["ReturnUrl"] = returnUrl;
       if (ModelState.IsValid)
       {
+        //Adding new customer to a database and referring to it in "users" table
         var customer = new Customer { Name = model.Email };
-        var optionsBuilder = new DbContextOptions<ShopContext>();
-       
-        using (var customerContext = new ShopContext(optionsBuilder))
-        {
- 
-          customerContext.Add(customer);
-          customerContext.SaveChanges();
-        }
+        _context.Add(customer);
+        await _context.SaveChangesAsync();
         var user = new ApplicationUser { UserName = model.Email, Email = model.Email, CustomerID = customer.CustomerID };
         var result = await _userManager.CreateAsync(user, model.Password);
         if (result.Succeeded)
