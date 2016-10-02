@@ -112,7 +112,7 @@ namespace DB.Controllers
       if (ModelState.IsValid)
       {
         //Adding new customer to a database and referring to it in "users" table
-        var customer = new Customer { Name = model.Email };
+        var customer = new Customer { Name = model.Name, Surname = model.Surname, Middlename = model.MiddleName, Email = model.Email, Telephone = model.PhoneNumber, Age = model.Age};
         _context.Add(customer);
         await _context.SaveChangesAsync();
         var user = new ApplicationUser { UserName = model.Email, Email = model.Email, CustomerID = customer.CustomerID };
