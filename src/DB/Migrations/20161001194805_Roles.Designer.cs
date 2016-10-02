@@ -8,8 +8,8 @@ using DB.Data;
 namespace DB.Migrations
 {
     [DbContext(typeof(ShopContext))]
-    [Migration("20161001112539_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20161001194805_Roles")]
+    partial class Roles
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -26,7 +26,7 @@ namespace DB.Migrations
 
                     b.Property<string>("Email");
 
-                    b.Property<decimal>("Height");
+                    b.Property<decimal?>("Height");
 
                     b.Property<string>("Middlename");
 
@@ -36,7 +36,7 @@ namespace DB.Migrations
 
                     b.Property<string>("Telephone");
 
-                    b.Property<decimal>("Weight");
+                    b.Property<decimal?>("Weight");
 
                     b.HasKey("CustomerID");
 
@@ -87,6 +87,8 @@ namespace DB.Migrations
                 {
                     b.Property<int>("PurchaseID")
                         .ValueGeneratedOnAdd();
+
+                    b.Property<int>("Amount");
 
                     b.Property<int?>("CustomerID");
 
