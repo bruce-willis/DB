@@ -9,7 +9,6 @@ namespace DB.Controllers
 {
   public class HomeController : Controller
   {
-    [Authorize(Roles = "Customer")]
     public IActionResult Index()
     {
       return View();

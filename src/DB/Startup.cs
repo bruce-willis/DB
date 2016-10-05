@@ -74,7 +74,10 @@ namespace DB
       }).AddEntityFrameworkStores<ApplicationDbContext>()
           .AddRoleManager<ApplicationRoleManager>()
           .AddDefaultTokenProviders();
-
+      services.AddAuthorization(options =>
+      {
+        options.AddPolicy("AdministratorOnly", policy => policy.RequireRole("Administrator"));
+      });
 
       services.AddMvc();
 
