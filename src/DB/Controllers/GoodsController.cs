@@ -125,7 +125,7 @@ namespace DB.Controllers
 
     public async Task<IActionResult> AddToCart(int id)
     {
-     
+
       var good = await _context.Goods.SingleOrDefaultAsync(m => m.GoodID == id);
       if (good == null)
       {
@@ -138,27 +138,33 @@ namespace DB.Controllers
         {
           var currentUser = await _userManager.GetUserAsync(User);
           var currentID = currentUser.CustomerID;
-          Customer customer = (from s in _context.Customers
-            where s.CustomerID == currentID
-            select s).FirstOrDefault<Customer>();
-          _context.Database.OpenConnection();
-          //_context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT dbo.Purchase ON");
-          //var customers = await _context.Customers.SingleOrDefaultAsync(m => m.CustomerID == currentID.Value);
-         // Customer customers = _context.Customers.Where(s => s.CustomerID == currentID.Value).FirstOrDefault<Customer>();
-          Purchase buffPurchase = new Purchase()
+          //Customer customer = (from s in _context.Customers
+          //  where s.CustomerID == currentID
+          //  select s).FirstOrDefault<Customer>();
+          var purchase = (from s in _context.Purchases
+                          where s.CustomerID == currentID
+                                && s.GoodID == good.GoodID
+                          select s).FirstOrDefault();
+          if (purchase != null)
           {
-            Amount = 1,
-            Time = DateTime.Now,
-            CustomerID = currentID.GetValueOrDefault(),
-            GoodID = id,
-            Good = good,
-            TotalPrice = good.Price                                                                 /// TODO: Fix TotalPrice
-          };
-          _context.Purchases.Add(buffPurchase);
-          customer.Cart.Add(buffPurchase);
+            ++purchase.Amount;
+            purchase.TotalPrice += good.Price;
+            purchase.Time = DateTime.Now;
+          }
+          else
+          {
+            _context.Purchases.Add(new Purchase
+              {
+              Amount = 1,
+              Time = DateTime.Now,
+              CustomerID = currentID.GetValueOrDefault(),
+              GoodID = id,
+              Good = good,
+              TotalPrice = good.Price
+            }
+            );
+          }
           _context.SaveChanges();
-          //_context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT dbo.Purchase OFF");
-          _context.Database.CloseConnection();
         }
         catch (DbUpdateConcurrencyException)
         {

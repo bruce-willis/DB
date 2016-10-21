@@ -29,15 +29,27 @@ namespace DB.Controllers
     {
       var currentUser = await _userManager.GetUserAsync(User);
       var currentID = currentUser.CustomerID;
-      var currentCustomer =  new Customer()
+      var currentCustomer = new Customer()
       {
         CustomerID = currentID.Value
       };
       // var cart = await  _context.Customers.
       var purchases = (from s in _context.Purchases
-        where s.CustomerID == currentID
-        select s).ToList(); ;/*SingleOrDefaultAsync(m => m.CustomerID == currentID.Value);*/
-     // Customer customers = _context.Customers.Where(s => s.CustomerID == currentID.Value).FirstOrDefault<Customer>();
+                       where s.CustomerID == currentID
+                       && !s.Bought
+                       select s).ToList();
+      foreach (var purchase in purchases)
+      {
+        purchase.Good = new Good
+        {
+          Name = (from s in _context.Goods
+                  where s.GoodID == purchase.GoodID
+                  select s).First().Name,
+          Price = (from s in _context.Goods
+                   where s.GoodID == purchase.GoodID
+                   select s).First().Price
+        };
+      }
       try
       {
         return View(purchases.ToList());
@@ -46,8 +58,8 @@ namespace DB.Controllers
       {
         return NotFound();
       }
-      
-      
+
+
     }
 
     // GET: Purchases/Details/5
@@ -65,6 +77,25 @@ namespace DB.Controllers
       }
 
       return View(purchase);
+    }
+
+    public async Task<IActionResult> Buy(int? id)
+    {
+      if (id == null)
+      {
+        return NotFound();
+      }
+
+      var purchase = await _context.Purchases.SingleOrDefaultAsync(m => m.PurchaseID == id);
+      if (purchase == null)
+      {
+        return NotFound();
+      }
+      purchase.Bought = true;
+      _context.Update(purchase);
+      _context.SaveChanges();
+
+      return RedirectToAction("Index");
     }
 
     // GET: Purchases/Create
