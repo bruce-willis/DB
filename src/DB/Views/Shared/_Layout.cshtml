@@ -1,3 +1,7 @@
+﻿@using System.Threading.Tasks
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.EntityFrameworkCore.Metadata.Internal
+@inject IAuthorizationService AuthorizationService
 <!DOCTYPE html>
 <html>
 <head>
@@ -34,7 +38,10 @@
                     <li><a asp-area="" asp-controller="Home" asp-action="About">About</a></li>
                     <li><a asp-area="" asp-controller="Home" asp-action="Contact">Contact</a></li>
                     <li><a asp-area="" asp-controller="Goods" asp-action="Index">Товары</a></li>
-
+                    @if (await AuthorizationService.AuthorizeAsync(User, "AuthorizeOnly"))
+                    {
+                    <li><a asp-area="" asp-controller="Purchases" asp-action="Index">Корзина</a></li>
+                    }
                 </ul>
                 @await Html.PartialAsync("_LoginPartial")
             </div>

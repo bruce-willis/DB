@@ -1,0 +1,45 @@
+﻿@using Microsoft.EntityFrameworkCore.Metadata.Internal
+@model IEnumerable<DB.Models.Purchase>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h2>Список покупок:</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Amount)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Time)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.TotalPrice)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.PurchaseID)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.TotalPrice)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Amount)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.PurchaseID">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.PurchaseID">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.PurchaseID">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿  using System.Collections.Generic;
 
 namespace DB.Models
 {
@@ -7,6 +7,7 @@ namespace DB.Models
     public int CustomerID { get; set; }
     public decimal? Weight { get; set; }
     public decimal? Height { get; set; }
-    public ICollection<Purchase> Purchases { get; set; }
+    public ICollection<Purchase> Cart { get; set; } 
   }
+
 }

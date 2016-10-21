@@ -12,6 +12,7 @@ namespace DB.Models
   public class Good
   {
     public int GoodID { get; set; }
+    public Purchase Purchase { get; set; }
     public string Name { get; set; }
     public string Description { get; set; }
     public decimal Price { get; set; }
@@ -19,6 +20,5 @@ namespace DB.Models
     public decimal? Protein { get; set; }
     public decimal? Fat { get; set; }
     public decimal? Carbohydrate { get; set; }
-
   }
 }

@@ -77,6 +77,7 @@ namespace DB
       services.AddAuthorization(options =>
       {
         options.AddPolicy("AdministratorOnly", policy => policy.RequireRole("Administrator"));
+        options.AddPolicy("AuthorizeOnly", policy => policy.RequireRole("Administrator", "Dealer", "Customer"));
       });
 
       services.AddMvc();

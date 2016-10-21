@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -8,16 +9,18 @@ using Microsoft.EntityFrameworkCore;
 using DB.Data;
 using DB.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 
 namespace DB.Controllers
 {
   public class GoodsController : Controller
   {
     private readonly ShopContext _context;
-
-    public GoodsController(ShopContext context)
+    private readonly UserManager<ApplicationUser> _userManager;
+    public GoodsController(ShopContext context, UserManager<ApplicationUser> userManager)
     {
       _context = context;
+      _userManager = userManager;
     }
 
     // GET: Goods
@@ -118,6 +121,58 @@ namespace DB.Controllers
         return RedirectToAction("Index");
       }
       return View(good);
+    }
+
+    public async Task<IActionResult> AddToCart(int id)
+    {
+     
+      var good = await _context.Goods.SingleOrDefaultAsync(m => m.GoodID == id);
+      if (good == null)
+      {
+        return NotFound();
+      }
+
+      if (ModelState.IsValid)
+      {
+        try
+        {
+          var currentUser = await _userManager.GetUserAsync(User);
+          var currentID = currentUser.CustomerID;
+          Customer customer = (from s in _context.Customers
+            where s.CustomerID == currentID
+            select s).FirstOrDefault<Customer>();
+          _context.Database.OpenConnection();
+          //_context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT dbo.Purchase ON");
+          //var customers = await _context.Customers.SingleOrDefaultAsync(m => m.CustomerID == currentID.Value);
+         // Customer customers = _context.Customers.Where(s => s.CustomerID == currentID.Value).FirstOrDefault<Customer>();
+          Purchase buffPurchase = new Purchase()
+          {
+            Amount = 1,
+            Time = DateTime.Now,
+            CustomerID = currentID.GetValueOrDefault(),
+            GoodID = id,
+            Good = good,
+            TotalPrice = good.Price                                                                 /// TODO: Fix TotalPrice
+          };
+          _context.Purchases.Add(buffPurchase);
+          customer.Cart.Add(buffPurchase);
+          _context.SaveChanges();
+          //_context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT dbo.Purchase OFF");
+          _context.Database.CloseConnection();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+          if (!GoodExists(good.GoodID))
+          {
+            return NotFound();
+          }
+          else
+          {
+            throw;
+          }
+        }
+      }
+      return RedirectToAction("Index");
     }
 
     // GET: Goods/Delete/5
