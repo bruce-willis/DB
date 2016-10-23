@@ -15,6 +15,7 @@ namespace DB.Models
     public int Amount { get; set; }
     public int CustomerID { get; set; }
     public Good Good { get; set; }
+    [ForeignKey("GoodID")]
     public int GoodID { get; set; }
     [DefaultValue(false)]
     public bool Bought { get; set; }

@@ -18,10 +18,10 @@ namespace DB.Data
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
       modelBuilder.Entity<Good>().ToTable("Good");
-        //.HasOne(s => s.Purchase)
-        //.WithOne(p => p.Good);
-      modelBuilder.Entity<Purchase>().ToTable("Purchase");
-       //.HasKey(e => e.GoodID);
+
+      modelBuilder.Entity<Purchase>().ToTable("Purchase")
+        .HasOne(p => p.Good).WithMany(s => s.Purchases);
+      // .HasKey(e => e.GoodID);
       modelBuilder.Entity<Customer>().ToTable("Customer")
         .HasMany(p => p.Cart).WithOne(p => p.Customer);
       modelBuilder.Entity<Dealer>().ToTable("Dealer");

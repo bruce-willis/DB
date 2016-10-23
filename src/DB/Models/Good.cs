@@ -13,6 +13,7 @@ namespace DB.Models
   {
     public int GoodID { get; set; }
     public Purchase Purchase { get; set; }
+    public ICollection<Purchase> Purchases { get; set; }
     public string Name { get; set; }
     public string Description { get; set; }
     public decimal Price { get; set; }

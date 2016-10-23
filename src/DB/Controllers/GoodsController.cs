@@ -144,6 +144,7 @@ namespace DB.Controllers
           var purchase = (from s in _context.Purchases
                           where s.CustomerID == currentID
                                 && s.GoodID == good.GoodID
+                                && !s.Bought
                           select s).FirstOrDefault();
           if (purchase != null)
           {
